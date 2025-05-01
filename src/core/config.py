@@ -1,0 +1,62 @@
+from pathlib import Path
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+DEFAULT_HOSTS = [
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://ssofront:3000",
+]
+
+
+class MainConfig(BaseSettings):
+    debug: bool = False
+    secret_key: str = "123"
+
+
+class DatabaseConfig(BaseSettings):
+    driver: str = "asyncpg"
+    user: str = "postgres"
+    password: str = "postgres"
+    host: str = "localhost"
+    port: int = 5432
+    name: str = "postgres"
+    echo: bool = False
+    echo_pool: bool = False
+    pool_size: int = 10
+    max_overflow: int = 20
+    pool_recycle: int = 600
+    pool_pre_ping: bool = True
+
+    @property
+    def url(self) -> str:
+        return (
+            "postgresql+asyncpg://"
+            f"{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+        )
+
+
+class RedisConfig(BaseSettings):
+    host: str = "localhost"
+    port: int = 6379
+
+    @property
+    def url(self) -> str:
+        return f"redis://{self.host}:{self.port}"
+
+
+class Config(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=f"{Path(__file__).resolve().parent.parent.parent}/secrets/.env",
+        case_sensitive=False,
+        env_nested_delimiter="__",
+        env_ignore_empty=True,
+        extra="ignore",
+    )
+    app: MainConfig = MainConfig()
+    db: DatabaseConfig = DatabaseConfig()
+    redis: RedisConfig = RedisConfig()
+
+
+config = Config()
