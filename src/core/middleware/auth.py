@@ -43,11 +43,12 @@ class SSOAuthBackend(AuthenticationBackend):
     async def authenticate(
         self, conn: HTTPConnection
     ) -> tuple[AuthCredentials, BaseUser] | None:
-        token = (
-            conn.cookies.get("access_token")
-            or conn.headers.get("Authorization")
-            or conn.headers.get("x-auth-token")
-        )
-        if not token:
-            raise AuthenticationError("Токен не был предоставлен")
+        if token := conn.cookies.get("access_token"):  # noqa SIM102
+            if user := await self.get_user(token):
+                return AuthCredentials(["authenticated"]), user
+
+        if token := conn.headers.get("x-api-key"):  # noqa SIM102
+            if user := await self.get_service(token):
+                return AuthCredentials(["authenticated"]), user
+
         return None
