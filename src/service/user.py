@@ -28,9 +28,11 @@ class UserServiceV1:
     def __init__(self, repo: type[UserRepoProtocol] = UserRepoV1):
         self._repo = repo()
 
-    async def create(self, data: UserInputSchema) -> UserOutputSchema:
+    async def create(self, user: UserInputSchema) -> UserOutputSchema:
         """Create user"""
-        return await self._repo.create_user(data)
+        hashed_password = self.get_password_hash(user.password)
+        user.password = hashed_password
+        return await self._repo.create_user(user)
 
     async def update(self, user_id: UUID, **data) -> UserOutputSchema | None:
         """Update user"""
