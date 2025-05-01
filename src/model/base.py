@@ -9,3 +9,7 @@ class Base(DeclarativeBase):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     __abstract__ = True
+
+    @classmethod
+    def ordering(cls):
+        return cls.id
