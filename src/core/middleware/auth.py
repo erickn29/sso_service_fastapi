@@ -1,13 +1,17 @@
+import jwt
+
+from jwt import InvalidTokenError
 from starlette.authentication import (
     AuthCredentials,
     AuthenticationBackend,
     AuthenticationError,
-    BaseUser,
     UnauthenticatedUser,
 )
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import HTTPConnection
 from starlette.types import Receive, Scope, Send
+
+from schema.user import UserOutputSchema
 
 
 class SSOAuthMiddleware(AuthenticationMiddleware):
@@ -42,13 +46,26 @@ class SSOAuthMiddleware(AuthenticationMiddleware):
 class SSOAuthBackend(AuthenticationBackend):
     async def authenticate(
         self, conn: HTTPConnection
-    ) -> tuple[AuthCredentials, BaseUser] | None:
+    ) -> tuple[AuthCredentials, UserOutputSchema] | None:
         if token := conn.cookies.get("access_token"):  # noqa SIM102
-            if user := await self.get_user(token):
+            if user := await self._get_user(token):
                 return AuthCredentials(["authenticated"]), user
 
         if token := conn.headers.get("x-api-key"):  # noqa SIM102
-            if user := await self.get_service(token):
+            if user := await self._get_service(token):
                 return AuthCredentials(["authenticated"]), user
 
         return None
+
+    async def _get_user(self, token: str) -> UserOutputSchema:
+        return UserOutputSchema()
+
+    async def _get_service(self, token: str) -> UserOutputSchema:
+        pass
+
+    @staticmethod
+    def _get_token_payload(token: str) -> dict:
+        try:
+            return jwt.decode(token, options={"verify_signature": False})
+        except InvalidTokenError as e:
+            raise AuthenticationError("Проблемы с токеном") from e
