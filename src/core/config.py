@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from passlib.context import CryptContext
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,6 +14,15 @@ DEFAULT_HOSTS = [
 class MainConfig(BaseSettings):
     debug: bool = False
     secret_key: str = "123"
+
+
+class AuthConfig(BaseSettings):
+    access_token_expire: int = 60 * 5
+    refresh_token_expire: int = 60 * 60 * 24 * 14
+    recovery_token_expire: int = 60 * 60 * 24
+    token_type: str = "Bearer"
+    algorithm: str = "HS256"
+    pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class DatabaseConfig(BaseSettings):
@@ -55,6 +65,7 @@ class Config(BaseSettings):
         extra="ignore",
     )
     app: MainConfig = MainConfig()
+    auth: AuthConfig = AuthConfig()
     db: DatabaseConfig = DatabaseConfig()
     redis: RedisConfig = RedisConfig()
 
