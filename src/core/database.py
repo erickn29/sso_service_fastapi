@@ -49,7 +49,7 @@ class DatabaseHelper:
 
 
 db_conn = DatabaseHelper(
-    url=cfg.db.url(),
+    url=cfg.db.url,
     echo=cfg.db.echo,
     echo_pool=cfg.db.echo_pool,
     pool_size=cfg.db.pool_size,
