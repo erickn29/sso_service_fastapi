@@ -50,10 +50,11 @@ class DatabaseConfig(BaseSettings):
 class RedisConfig(BaseSettings):
     host: str = "localhost"
     port: int = 6379
+    db: int = 10
 
     @property
     def url(self) -> str:
-        return f"redis://{self.host}:{self.port}"
+        return f"redis://{self.host}:{self.port}/{self.db}"
 
 
 class Config(BaseSettings):

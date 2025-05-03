@@ -1,9 +1,13 @@
 from datetime import datetime
+from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserOutputSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID | str
     email: str
     first_name: str
     last_name: str
@@ -12,6 +16,10 @@ class UserOutputSchema(BaseModel):
     is_service: bool
     created_at: datetime
     updated_at: datetime
+
+    @property
+    def is_authenticated(self):
+        return True
 
 
 class UserInputSchema(BaseModel):

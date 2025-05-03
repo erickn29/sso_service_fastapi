@@ -1,10 +1,13 @@
 from uuid import UUID
 
+from model import User
 from repository.base import BaseRepo
 from schema.user import UserInputSchema, UserOutputSchema
 
 
 class UserRepoV1(BaseRepo):
+    model = User
+
     async def create_user(self, data: UserInputSchema) -> UserOutputSchema:
         """Create user"""
         obj = await self.create(**data.model_dump())
