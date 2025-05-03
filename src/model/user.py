@@ -10,7 +10,7 @@ class User(Base):
     __tablename__ = "user"
 
     password: Mapped[str] = mapped_column(Text)
-    email: Mapped[str] = mapped_column(String(320))
+    email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
     first_name: Mapped[str] = mapped_column(String(16), default="")
     last_name: Mapped[str] = mapped_column(String(16), default="")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -33,3 +33,7 @@ class User(Base):
         first_name = self.first_name or "User"
         last_name = self.last_name or str(self.id)[:5]
         return first_name + " " + last_name
+
+    @classmethod
+    def ordering(cls):
+        return [cls.created_at]

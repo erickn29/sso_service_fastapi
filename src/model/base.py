@@ -12,4 +12,4 @@ class Base(DeclarativeBase):
 
     @classmethod
     def ordering(cls):
-        return cls.id
+        return [cls.id]
