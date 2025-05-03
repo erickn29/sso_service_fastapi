@@ -1,9 +1,11 @@
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 
 class UserOutputSchema(BaseModel):
+    id: UUID
     email: str
     first_name: str
     last_name: str
