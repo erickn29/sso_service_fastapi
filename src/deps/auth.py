@@ -19,7 +19,7 @@ def is_admin(
     user: Annotated[UserOutputSchema, Depends(is_authenticated)],
 ) -> UserOutputSchema:
     if not user.is_admin:
-        raise HTTPException(status_code=403, detail="Пользователь не админ")
+        raise HTTPException(status_code=403, detail="Пользователь не является админом")
     return user
 
 
@@ -27,5 +27,5 @@ def is_service(
     user: Annotated[UserOutputSchema, Depends(is_authenticated)],
 ) -> UserOutputSchema:
     if not user.is_service:
-        raise HTTPException(status_code=403, detail="Пользователь не сервис")
+        raise HTTPException(status_code=403, detail="Пользователь не является сервисом")
     return user

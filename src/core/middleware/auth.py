@@ -84,9 +84,10 @@ class SSOAuthBackend:
             return UserOutputSchema.model_validate(json.loads(user))
         user_service = UserServiceV1()
         if user := await user_service.find(user_id=user_id):
+            user_json = UserOutputSchema.model_dump_json(user)
             await cache_service.set(
                 name=self.user_cache_key + str(user_id),
-                value=json.dumps(user.model_dump()),
+                value=user_json,
                 expires_in=self.token_expires_in,
             )
             return user
@@ -107,4 +108,4 @@ class SSOAuthBackend:
         try:
             return jwt.decode(token, verify=True)
         except InvalidTokenError as e:
-            raise AuthenticationError("Проблемы с токеном") from e
+            raise AuthenticationError("Ошибка получения token payload") from e

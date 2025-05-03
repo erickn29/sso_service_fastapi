@@ -33,3 +33,7 @@ class User(Base):
         first_name = self.first_name or "User"
         last_name = self.last_name or str(self.id)[:5]
         return first_name + " " + last_name
+
+    @classmethod
+    def ordering(cls):
+        return [cls.created_at]
