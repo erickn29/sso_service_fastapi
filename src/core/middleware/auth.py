@@ -1,9 +1,12 @@
+import json
+
+from uuid import UUID
+
 import jwt
 
 from jwt import InvalidTokenError
 from starlette.authentication import (
     AuthCredentials,
-    AuthenticationBackend,
     AuthenticationError,
     UnauthenticatedUser,
 )
@@ -11,7 +14,9 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import HTTPConnection
 from starlette.types import Receive, Scope, Send
 
+from core.cache import cache_service
 from schema.user import UserOutputSchema
+from service.user import UserServiceV1
 
 
 class SSOAuthMiddleware(AuthenticationMiddleware):
@@ -43,7 +48,10 @@ class SSOAuthMiddleware(AuthenticationMiddleware):
         await self.app(scope, receive, send)
 
 
-class SSOAuthBackend(AuthenticationBackend):
+class SSOAuthBackend:
+    user_cache_key = "user"
+    token_expires_in = 60 * 5
+
     async def authenticate(
         self, conn: HTTPConnection
     ) -> tuple[AuthCredentials, UserOutputSchema] | None:
@@ -57,15 +65,46 @@ class SSOAuthBackend(AuthenticationBackend):
 
         return None
 
-    async def _get_user(self, token: str) -> UserOutputSchema:
-        return UserOutputSchema()
+    async def _get_user(self, token: str) -> UserOutputSchema | None:
+        token_data = self._get_token_payload(token)
+        user_id = token_data.get("id")
+        if not user_id:
+            return None
+        user_id = self._validate_token(user_id)
+        return await self._find_user(user_id)
 
-    async def _get_service(self, token: str) -> UserOutputSchema:
-        pass
+    async def _get_service(self, token: str) -> UserOutputSchema | None:
+        service_id = self._validate_token(token)
+        if not service_id:
+            return None
+        return await self._find_user(service_id)
+
+    async def _find_user(self, user_id: UUID):
+        if user := await cache_service.get(self.user_cache_key + str(user_id)):
+            return UserOutputSchema.model_validate(json.loads(user))
+        user_service = UserServiceV1()
+        if user := await user_service.find(user_id=user_id):
+            await cache_service.set(
+                name=self.user_cache_key + str(user_id),
+                value=json.dumps(user.model_dump()),
+                expires_in=self.token_expires_in,
+            )
+            return user
+        return None
+
+    @staticmethod
+    def _validate_token(token: str) -> UUID | None:
+        if not token:
+            return None
+        try:
+            token_uuid = UUID(token)
+            return token_uuid
+        except ValueError:
+            return None
 
     @staticmethod
     def _get_token_payload(token: str) -> dict:
         try:
-            return jwt.decode(token, options={"verify_signature": False})
+            return jwt.decode(token, verify=True)
         except InvalidTokenError as e:
             raise AuthenticationError("Проблемы с токеном") from e

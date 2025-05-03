@@ -10,7 +10,7 @@ class User(Base):
     __tablename__ = "user"
 
     password: Mapped[str] = mapped_column(Text)
-    email: Mapped[str] = mapped_column(String(320))
+    email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
     first_name: Mapped[str] = mapped_column(String(16), default="")
     last_name: Mapped[str] = mapped_column(String(16), default="")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
