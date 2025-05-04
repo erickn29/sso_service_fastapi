@@ -5,7 +5,7 @@ from uuid import UUID
 
 import jwt
 
-from jwt import InvalidSignatureError, InvalidTokenError
+from jwt import InvalidTokenError
 from starlette.authentication import (
     AuthCredentials,
     AuthenticationError,
@@ -52,7 +52,7 @@ class SSOAuthMiddleware(AuthenticationMiddleware):
 
 
 class SSOAuthBackend:
-    user_cache_key = "user"
+    user_cache_key = "user:"
     token_expires_in = 60 * 5
 
     async def authenticate(
@@ -117,16 +117,14 @@ class SSOAuthBackend:
             )
         except InvalidTokenError as e:
             raise AuthenticationError("Ошибка получения token payload") from e
-        except InvalidSignatureError as e:
-            raise AuthenticationError("Неверная сигнатура jwt") from e
 
     @staticmethod
     def _check_iat(payload: dict):
-        if not payload or not payload.get("iat"):
-            raise AuthenticationError("Не найден iat jwt")
+        if not payload or not payload.get("expat"):
+            raise AuthenticationError("Не найден expat expat")
         try:
-            iat = float(payload.get("iat", 0))
+            expat = float(payload.get("expat", 0))
         except ValueError:
             raise AuthenticationError("Неверный формат даты в jwt") from None
-        if datetime.now(tz=TZ.MSK).timestamp() > iat:
+        if datetime.now(tz=TZ.MSK).timestamp() > expat:
             raise AuthenticationError("Обновите токен")

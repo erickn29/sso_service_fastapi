@@ -34,7 +34,7 @@ def is_service(
 def is_admin_or_service(
     user: Annotated[UserOutputSchema, Depends(is_authenticated)],
 ):
-    if not user.is_admin or not user.is_service:
+    if not user.is_admin and not user.is_service:
         raise HTTPException(
             status_code=403, detail="Пользователь не является админом или сервисом"
         )

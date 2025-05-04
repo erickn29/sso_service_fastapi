@@ -1,11 +1,8 @@
-import asyncio
-
 from collections.abc import AsyncGenerator
 from typing import Any
 
 import pytest
 
-from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -27,14 +24,14 @@ from tests.helpers.http_client.client import get_http_client
 from tests.helpers.initial_db_data.data import set_initial_data
 
 
-@pytest.fixture(scope="session", autouse=True)
-def event_loop():
-    try:
-        loop = asyncio.get_event_loop()
-    except (RuntimeError, RuntimeWarning):
-        loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
+# @pytest.fixture(scope="session", autouse=True)
+# def event_loop():
+#     try:
+#         loop = asyncio.get_event_loop()
+#     except (RuntimeError, RuntimeWarning):
+#         loop = asyncio.new_event_loop()
+#     yield loop
+#     loop.close()
 
 
 @pytest.fixture(scope="session")
@@ -79,7 +76,7 @@ async def init_data(refresh_db, session):
 
 
 @pytest.fixture
-async def fake_redis(init_data):
+async def fake_redis():
     redis = await get_fake_redis()
     return redis
 
@@ -107,7 +104,16 @@ async def client_service(init_data):
 
 
 @pytest.fixture(scope="function")
+async def client_blocked_service(init_data):
+    client = await get_http_client(
+        app=app, headers={"x-api-key": str(init_data["blocked_service"].id)}
+    )
+    async with client:
+        yield client
+
+
+@pytest.fixture(scope="function")
 async def client_anonym():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport) as client:
+    client = await get_http_client(app=app)
+    async with client:
         yield client
