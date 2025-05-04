@@ -1,3 +1,5 @@
+import asyncio
+
 from collections.abc import AsyncGenerator
 from typing import Any
 
@@ -24,14 +26,14 @@ from tests.helpers.http_client.client import get_http_client
 from tests.helpers.initial_db_data.data import set_initial_data
 
 
-# @pytest.fixture(scope="session", autouse=True)
-# def event_loop():
-#     try:
-#         loop = asyncio.get_event_loop()
-#     except (RuntimeError, RuntimeWarning):
-#         loop = asyncio.new_event_loop()
-#     yield loop
-#     loop.close()
+@pytest.fixture(scope="session", autouse=True)
+def event_loop():
+    try:
+        loop = asyncio.get_event_loop()
+    except (RuntimeError, RuntimeWarning):
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest.fixture(scope="session")
@@ -89,6 +91,14 @@ async def mock_redis(mocker, fake_redis):
 @pytest.fixture(scope="function")
 async def client_admin(init_data):
     jwt = get_jwt(init_data["admin"].id, config.app.secret_key)
+    client = await get_http_client(app=app, cookies={"access_token": jwt})
+    async with client:
+        yield client
+
+
+@pytest.fixture(scope="function")
+async def client_default(init_data):
+    jwt = get_jwt(init_data["default"].id, config.app.secret_key)
     client = await get_http_client(app=app, cookies={"access_token": jwt})
     async with client:
         yield client

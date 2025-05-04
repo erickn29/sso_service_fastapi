@@ -13,5 +13,5 @@ async def test_healthcheck_admin_200(init_data, fake_redis, client_admin):
     }
     jwt_ = jwt.encode(payload_data, config.app.secret_key, "HS256")
     client_admin.cookies = {"access_token": jwt_}
-    response = await client_admin.get("/healthcheck")
+    response = await client_admin.get("/api/healthcheck/")
     assert response.json() == {"status": "ok"}
