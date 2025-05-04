@@ -1,5 +1,3 @@
-import json
-
 from datetime import datetime
 from uuid import UUID
 
@@ -15,7 +13,6 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import HTTPConnection
 from starlette.types import Receive, Scope, Send
 
-from core.cache import cache_service
 from core.config import config
 from core.constants import TZ
 from schema.user import UserOutputSchema
@@ -85,19 +82,9 @@ class SSOAuthBackend:
             return None
         return await self._find_user(service_id)
 
-    async def _find_user(self, user_id: UUID):
-        if user := await cache_service.get(self.user_cache_key + str(user_id)):
-            return UserOutputSchema.model_validate(json.loads(user))
-        user_service = UserServiceV1()
-        if user := await user_service.find(user_id=user_id):
-            user_json = UserOutputSchema.model_dump_json(user)
-            await cache_service.set(
-                name=self.user_cache_key + str(user_id),
-                value=user_json,
-                expires_in=self.token_expires_in,
-            )
-            return user
-        return None
+    @staticmethod
+    async def _find_user(user_id: UUID) -> UserOutputSchema | None:
+        return await UserServiceV1().find(user_id=user_id)
 
     @staticmethod
     def _validate_token(token: str) -> UUID | None:

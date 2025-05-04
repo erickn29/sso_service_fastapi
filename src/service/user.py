@@ -1,6 +1,9 @@
+import json
+
 from typing import Protocol
 from uuid import UUID
 
+from core.cache import Cache, cache_service
 from core.config import config as cfg
 from repository.user import UserRepoV1
 from schema.user import UserInputSchema, UserOutputSchema
@@ -25,14 +28,20 @@ class UserRepoProtocol(Protocol):
 
 
 class UserServiceV1:
-    def __init__(self, repo: type[UserRepoProtocol] = UserRepoV1):
+    user_cache_key = "user:"
+
+    def __init__(
+        self, repo: type[UserRepoProtocol] = UserRepoV1, cache: Cache = cache_service
+    ):
         self._repo = repo()
+        self._cache = cache
 
     async def create(self, user: UserInputSchema) -> UserOutputSchema:
         """Create user"""
-        hashed_password = self.get_password_hash(user.password)
-        user.password = hashed_password
-        return await self._repo.create_user(user)
+        user.password = self.get_password_hash(user.password)
+        user = await self._repo.create_user(user)
+        await self._set_user_to_cache(user)
+        return user
 
     async def update(self, user_id: UUID, **data) -> UserOutputSchema | None:
         """Update user"""
@@ -40,7 +49,12 @@ class UserServiceV1:
 
     async def find(self, user_id: UUID) -> UserOutputSchema | None:
         """Find user"""
-        return await self._repo.find_user(user_id)
+        if user := await self._get_user_from_cache(user_id):
+            return user
+        if user := await self._repo.find_user(user_id):
+            await self._set_user_to_cache(user)
+            return user
+        return None
 
     async def delete(self, user_id: UUID):
         """Deactivate user"""
@@ -57,3 +71,16 @@ class UserServiceV1:
     def get_password_hash(password) -> str:
         """Хэширует пароль пользователя, нужно для регистрации или смены пароля"""
         return cfg.auth.pwd_context.hash(cfg.app.secret_key + password)
+
+    async def _set_user_to_cache(self, user: UserOutputSchema):
+        user_json = UserOutputSchema.model_dump_json(user)
+        await self._cache.set(
+            name=self.user_cache_key + str(user.id),
+            value=user_json,
+            expires_in=60 * 5,
+        )
+
+    async def _get_user_from_cache(self, user_id: UUID) -> UserOutputSchema | None:
+        if user := await self._cache.get(self.user_cache_key + str(user_id)):
+            return UserOutputSchema.model_validate(json.loads(user))
+        return None
