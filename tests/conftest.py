@@ -1,5 +1,4 @@
 import asyncio
-import uuid
 
 from collections.abc import AsyncGenerator
 from typing import Any
@@ -99,21 +98,16 @@ async def client_admin(init_data):
 
 
 @pytest.fixture(scope="function")
-async def client_anonym():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(
-        transport=transport, base_url="http://127.0.0.1:1234"  # nosec
-    ) as client:
+async def client_service(init_data):
+    client = await get_http_client(
+        app=app, headers={"x-api-key": str(init_data["service"].id)}
+    )
+    async with client:
         yield client
 
 
 @pytest.fixture(scope="function")
-async def client_anonym_with_token():
-    user_id = str(uuid.uuid4())
+async def client_anonym():
     transport = ASGITransport(app=app)
-    async with AsyncClient(
-        transport=transport, base_url="http://127.0.0.1:1234"  # nosec
-    ) as client:
-        client.cookies.set(name="anonim_token", value=user_id)
-        client.headers.update({"x-anonim-token": user_id})
+    async with AsyncClient(transport=transport) as client:
         yield client

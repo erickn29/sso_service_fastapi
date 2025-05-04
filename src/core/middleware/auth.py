@@ -1,10 +1,11 @@
 import json
 
+from datetime import datetime
 from uuid import UUID
 
 import jwt
 
-from jwt import InvalidTokenError
+from jwt import InvalidSignatureError, InvalidTokenError
 from starlette.authentication import (
     AuthCredentials,
     AuthenticationError,
@@ -15,6 +16,8 @@ from starlette.requests import HTTPConnection
 from starlette.types import Receive, Scope, Send
 
 from core.cache import cache_service
+from core.config import config
+from core.constants import TZ
 from schema.user import UserOutputSchema
 from service.user import UserServiceV1
 
@@ -67,10 +70,13 @@ class SSOAuthBackend:
 
     async def _get_user(self, token: str) -> UserOutputSchema | None:
         token_data = self._get_token_payload(token)
+        self._check_iat(token_data)
         user_id = token_data.get("id")
         if not user_id:
             return None
         user_id = self._validate_token(user_id)
+        if not user_id:
+            return None
         return await self._find_user(user_id)
 
     async def _get_service(self, token: str) -> UserOutputSchema | None:
@@ -106,6 +112,21 @@ class SSOAuthBackend:
     @staticmethod
     def _get_token_payload(token: str) -> dict:
         try:
-            return jwt.decode(token, verify=True)
+            return jwt.decode(
+                jwt=token, verify=True, algorithms="HS256", key=config.app.secret_key
+            )
         except InvalidTokenError as e:
             raise AuthenticationError("Ошибка получения token payload") from e
+        except InvalidSignatureError as e:
+            raise AuthenticationError("Неверная сигнатура jwt") from e
+
+    @staticmethod
+    def _check_iat(payload: dict):
+        if not payload or not payload.get("iat"):
+            raise AuthenticationError("Не найден iat jwt")
+        try:
+            iat = float(payload.get("iat", 0))
+        except ValueError:
+            raise AuthenticationError("Неверный формат даты в jwt") from None
+        if datetime.now(tz=TZ.MSK).timestamp() > iat:
+            raise AuthenticationError("Обновите токен")
