@@ -1,7 +1,8 @@
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from deps.auth import is_admin_or_service
 from schema.user import (
     UserDeleteSchema,
     UserInputSchema,
@@ -11,7 +12,7 @@ from schema.user import (
 from service.user import UserServiceV1
 
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(is_admin_or_service)])
 
 
 @router.post("/", response_model=UserOutputSchema, status_code=201)

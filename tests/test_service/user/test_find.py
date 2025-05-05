@@ -9,7 +9,7 @@ async def test_find_user(fake_redis, session, init_data):
     assert cached_user is None
 
     us = UserServiceV1(cache=fake_redis)
-    user = await us.find(user_id=init_data["default"].id)
+    user = await us.find_by_id(user_id=init_data["default"].id)
     cached_user = await fake_redis.get(f"user:{user.id}")
 
     assert isinstance(user, UserOutputSchema)

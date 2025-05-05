@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from schema.auth import LoginSchema, TokenSchema
 from service.auth import AuthService
@@ -9,7 +9,9 @@ router = APIRouter()
 
 @router.post("/login/", response_model=TokenSchema)
 async def login(login_data: LoginSchema):
-    return await AuthService().get_tokens(login_data)
+    if tokens := await AuthService().get_tokens(login_data):
+        return TokenSchema(**tokens)
+    raise HTTPException(400, "Неверный логин или пароль")
 
 
 @router.get("/token/")
