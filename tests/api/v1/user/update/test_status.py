@@ -1,4 +1,4 @@
-async def test_create_user_service_201(client_service, init_data):
+async def test_update_user_service_201(client_service, init_data):
     user_data = {
         "email": "example@email.com",
         # "password": "my_password",
@@ -11,7 +11,7 @@ async def test_create_user_service_201(client_service, init_data):
     assert response.status_code == 201
 
 
-async def test_create_user_anonym_401(client_anonym, init_data):
+async def test_update_user_anonym_401(client_anonym, init_data):
     user_data = {
         "email": "example@email.com",
         "password": "my_password",
@@ -24,7 +24,7 @@ async def test_create_user_anonym_401(client_anonym, init_data):
     assert response.status_code == 401
 
 
-async def test_create_user_blocked_401(client_blocked_service, init_data):
+async def test_update_user_blocked_401(client_blocked_service, init_data):
     user_data = {
         "email": "example@email.com",
         "password": "my_password",
@@ -37,7 +37,7 @@ async def test_create_user_blocked_401(client_blocked_service, init_data):
     assert response.status_code == 401
 
 
-async def test_create_user_default_403(client_default, init_data):
+async def test_update_user_default_403(client_default, init_data):
     user_data = {
         "email": "example@email.com",
         "password": "my_password",
@@ -50,7 +50,7 @@ async def test_create_user_default_403(client_default, init_data):
     assert response.status_code == 403
 
 
-async def test_create_user_service_bad_email_422(client_service, init_data):
+async def test_update_user_service_bad_email_422(client_service, init_data):
     user_data = {
         "email": "e@lc",
         "password": "my_password",
@@ -63,7 +63,7 @@ async def test_create_user_service_bad_email_422(client_service, init_data):
     assert response.status_code == 422
 
 
-async def test_create_user_service_bad_passw_422(client_service, init_data):
+async def test_update_user_service_bad_passw_422(client_service, init_data):
     user_data = {
         "email": "example@email.com",
         "password": "my_pa",

@@ -1,7 +1,7 @@
 from model import User
 
 
-async def test_create_user_service_201(client_service, init_data, session):
+async def test_update_user_service_201(client_service, init_data, session):
     user_data = {
         "email": "example@email.com",
         "password": "my_password",
@@ -27,7 +27,7 @@ async def test_create_user_service_201(client_service, init_data, session):
     assert user.password != user_data["password"]
 
 
-async def test_create_user_service_no_passw_201(client_service, init_data, session):
+async def test_update_user_service_no_passw_201(client_service, init_data, session):
     user_data = {
         # "email": "example@email.com",
         # "password": "my_password",
@@ -50,7 +50,7 @@ async def test_create_user_service_no_passw_201(client_service, init_data, sessi
     assert isinstance(r["updated_at"], str)
 
 
-async def test_create_user_service_empty_name_201(client_service, init_data, session):
+async def test_update_user_service_empty_name_201(client_service, init_data, session):
     user_data = {
         "email": "example@email.com",
         "password": "my_password",
