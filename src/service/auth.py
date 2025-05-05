@@ -64,14 +64,16 @@ class AuthService:
         user = await self._user_service.find_by_email(login_data.email)
         if not user:
             return None
-        if not self._user_service.verify_password(login_data.password, user.password):
+        if not hasattr(user, "password"):
             return None
-        refresh_token = self._get_token(user.id, config.auth.refresh_token_expire)
-        access_token = self._get_token(user.id, config.auth.access_token_expire)
+        if not self._user_service.verify_password(login_data.password, user.password):  # type: ignore
+            return None
+        refresh_token = self._get_token(str(user.id), config.auth.refresh_token_expire)
+        access_token = self._get_token(str(user.id), config.auth.access_token_expire)
         return {"refresh_token": refresh_token, "access_token": access_token}
 
     @staticmethod
-    def _get_token(user_id: UUID, exp_time: int):
+    def _get_token(user_id: str, exp_time: int):
         now = datetime.now(tz=TZ.MSK).timestamp()
         return jwt.encode(
             {"id": str(user_id), "expat": now + exp_time},

@@ -81,7 +81,7 @@ class SSOAuthBackend:
 
     @staticmethod
     async def _find_user(user_id: UUID) -> UserOutputSchema | None:
-        return await UserServiceV1().find(user_id=user_id)
+        return await UserServiceV1().find_by_id(user_id=user_id)
 
     @staticmethod
     def _validate_token(token: str) -> UUID | None:

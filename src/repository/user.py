@@ -27,12 +27,12 @@ class UserRepoV1(BaseRepo):
         self, is_password: bool = False, **filters
     ) -> UserOutputSchema | None:
         """Find user"""
-        obj: User = await self.find(**filters, is_active=True)
+        obj: User | None = await self.find(**filters, is_active=True)
         if not obj:
             return None
         user_schema = UserOutputSchema.model_validate(obj)
         if is_password:
-            user_schema.password = obj.password
+            user_schema.password = obj.password  # type: ignore
         return user_schema
 
     async def delete_user(self, user_id: UUID) -> UserOutputSchema | None:
