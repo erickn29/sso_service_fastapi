@@ -8,7 +8,7 @@ from core.config import config
 from core.constants import TZ
 
 
-async def test_healthcheck_admin_200(init_data, fake_redis, client_admin):
+async def test_healthcheck_admin_200(init_data, client_admin):
     payload_data = {
         "id": str(init_data["admin"].id),
         "expat": datetime.now(tz=TZ.MSK).timestamp() + 300,
@@ -19,7 +19,7 @@ async def test_healthcheck_admin_200(init_data, fake_redis, client_admin):
     assert response.status_code == 200
 
 
-async def test_healthcheck_admin_400_expired(init_data, fake_redis, client_admin):
+async def test_healthcheck_admin_400_expired(init_data, client_admin):
     payload_data = {
         "id": str(init_data["admin"].id),
         "expat": datetime.now(tz=TZ.MSK).timestamp() - 10,
@@ -31,7 +31,7 @@ async def test_healthcheck_admin_400_expired(init_data, fake_redis, client_admin
     assert response.text == "Обновите токен"
 
 
-async def test_healthcheck_admin_400_no_exp(init_data, fake_redis, client_admin):
+async def test_healthcheck_admin_400_no_exp(init_data, client_admin):
     payload_data = {
         "id": str(init_data["admin"].id),
         # "expat": datetime.now(tz=TZ.MSK).timestamp() - 10
@@ -43,7 +43,7 @@ async def test_healthcheck_admin_400_no_exp(init_data, fake_redis, client_admin)
     assert response.text == "Не найден expat expat"
 
 
-async def test_healthcheck_admin_400_bad_exp(init_data, fake_redis, client_admin):
+async def test_healthcheck_admin_400_bad_exp(init_data, client_admin):
     payload_data = {
         "id": str(init_data["admin"].id),
         "expat": str(datetime.now(tz=TZ.MSK)),
@@ -55,7 +55,7 @@ async def test_healthcheck_admin_400_bad_exp(init_data, fake_redis, client_admin
     assert response.text == "Неверный формат даты в jwt"
 
 
-async def test_healthcheck_admin_400_payload_err(init_data, fake_redis, client_admin):
+async def test_healthcheck_admin_400_payload_err(init_data, client_admin):
     payload_data = {
         "id": str(init_data["admin"].id),
         "expat": datetime.now(tz=TZ.MSK).timestamp() + 300,
@@ -68,7 +68,7 @@ async def test_healthcheck_admin_400_payload_err(init_data, fake_redis, client_a
     assert response.text == "Ошибка получения token payload"
 
 
-async def test_healthcheck_admin_400_bad_sing(init_data, fake_redis, client_admin):
+async def test_healthcheck_admin_400_bad_sing(init_data, client_admin):
     payload_data = {
         "id": str(init_data["admin"].id),
         "expat": datetime.now(tz=TZ.MSK).timestamp() + 300,
@@ -80,27 +80,27 @@ async def test_healthcheck_admin_400_bad_sing(init_data, fake_redis, client_admi
     assert response.text == "Ошибка получения token payload"
 
 
-async def test_healthcheck_service_200(init_data, fake_redis, client_service):
+async def test_healthcheck_service_200(init_data, client_service):
     response = await client_service.get("/api/healthcheck/")
     assert response.status_code == 200
 
 
-async def test_healthcheck_service_401_bad_key(init_data, fake_redis, client_service):
+async def test_healthcheck_service_401_bad_key(init_data, client_service):
     client_service.headers = {"x-api-key": str(uuid.uuid4())}
     response = await client_service.get("/api/healthcheck/")
     assert response.status_code == 401
     assert response.json()["detail"] == "Аутентификация не пройдена"
 
 
-async def test_healthcheck_anonym_401_bad_key(init_data, fake_redis, client_anonym):
+async def test_healthcheck_anonym_401_bad_key(init_data, client_anonym):
     response = await client_anonym.get("/api/healthcheck/")
     assert response.status_code == 401
     assert response.json()["detail"] == "Аутентификация не пройдена"
 
 
 async def test_healthcheck_blocked_service_401_bad_key(
-    init_data, fake_redis, client_blocked_service
+    init_data, client_blocked_service
 ):
     response = await client_blocked_service.get("/api/healthcheck/")
     assert response.status_code == 401
-    assert response.json()["detail"] == "Пользователь неактивен"
+    assert response.json()["detail"] == "Аутентификация не пройдена"

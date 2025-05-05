@@ -1,4 +1,4 @@
-async def test_create_user_service_201(client_service, session):
+async def test_create_user_service_201(client_service):
     user_data = {
         "email": "example@email.com",
         "password": "my_password",

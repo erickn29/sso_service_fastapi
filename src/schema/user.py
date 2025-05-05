@@ -32,3 +32,7 @@ class UserInputSchema(BaseModel):
 class UserLoginSchema(BaseModel):
     email: str = Field(min_length=5, max_length=320)
     password: str = Field(min_length=8)
+
+
+class UserDeleteSchema(BaseModel):
+    success: bool

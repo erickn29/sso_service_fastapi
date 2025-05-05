@@ -1,9 +1,8 @@
-from http.client import HTTPException
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
-from schema.user import UserInputSchema, UserOutputSchema
+from schema.user import UserDeleteSchema, UserInputSchema, UserOutputSchema
 from service.user import UserServiceV1
 
 
@@ -31,7 +30,7 @@ async def update_user(user_id: UUID, user: UserInputSchema):
     raise HTTPException(404)
 
 
-@router.delete("/{user_id}/", status_code=204)
+@router.delete("/{user_id}/", response_model=UserDeleteSchema, status_code=201)
 async def delete_user(user_id: UUID):
     user = await UserServiceV1().delete(user_id)
     return {"success": bool(user)}

@@ -251,6 +251,8 @@ class BaseRepo(Generic[T]):
             setattr(instance, key, value)
         async with self._db.get_session() as session, session.begin():
             session.add(instance)
+            await session.flush()
+            await session.refresh(instance)
             return instance
 
     async def delete(self, instance: T) -> None:
