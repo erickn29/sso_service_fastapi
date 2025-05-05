@@ -23,7 +23,7 @@ async def create_user(user: UserInputSchema):
 @router.get("/{user_id}/", response_model=UserOutputSchema, status_code=200)
 async def read_user(user_id: UUID):
     """Получение пользователя"""
-    if user := await UserServiceV1().find(user_id):
+    if user := await UserServiceV1().find_by_id(user_id):
         return user
     raise HTTPException(404)
 

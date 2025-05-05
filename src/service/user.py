@@ -20,7 +20,9 @@ class UserRepoProtocol(Protocol):
         """Update user"""
         pass
 
-    async def find_user(self, user_id: UUID) -> UserOutputSchema | None:
+    async def find_user(
+        self, is_password: bool = False, **filters
+    ) -> UserOutputSchema | None:
         """Find user"""
         pass
 
@@ -56,11 +58,18 @@ class UserServiceV1:
             return user
         return None
 
-    async def find(self, user_id: UUID) -> UserOutputSchema | None:
+    async def find_by_id(self, user_id: UUID) -> UserOutputSchema | None:
         """Find user"""
         if user := await self._get_user_from_cache(user_id):
             return user
-        if user := await self._repo.find_user(user_id):
+        if user := await self._repo.find_user(id=user_id):
+            await self._set_user_to_cache(user)
+            return user
+        return None
+
+    async def find_by_email(self, email: str) -> UserOutputSchema | None:
+        """Find user"""
+        if user := await self._repo.find_user(is_password=True, email=email):
             await self._set_user_to_cache(user)
             return user
         return None

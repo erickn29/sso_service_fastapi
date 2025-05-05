@@ -23,12 +23,17 @@ class UserRepoV1(BaseRepo):
         updated_obj = await self.update(obj, **data)
         return UserOutputSchema.model_validate(updated_obj)
 
-    async def find_user(self, user_id: UUID) -> UserOutputSchema | None:
+    async def find_user(
+        self, is_password: bool = False, **filters
+    ) -> UserOutputSchema | None:
         """Find user"""
-        obj = await self.find(id=user_id, is_active=True)
+        obj: User = await self.find(**filters, is_active=True)
         if not obj:
             return None
-        return UserOutputSchema.model_validate(obj)
+        user_schema = UserOutputSchema.model_validate(obj)
+        if is_password:
+            user_schema.password = obj.password
+        return user_schema
 
     async def delete_user(self, user_id: UUID) -> UserOutputSchema | None:
         """Deactivate user"""

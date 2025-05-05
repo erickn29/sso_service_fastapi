@@ -18,7 +18,7 @@ class MainConfig(BaseSettings):
 
 class AuthConfig(BaseSettings):
     access_token_expire: int = 60 * 5
-    refresh_token_expire: int = 60 * 60 * 24 * 14
+    refresh_token_expire: int = 60 * 60 * 24 * 15
     recovery_token_expire: int = 60 * 60 * 24
     token_type: str = "Bearer"
     algorithm: str = "HS256"
