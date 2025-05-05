@@ -51,7 +51,10 @@ class UserServiceV1:
         """Update user"""
         if data.get("password"):
             data["password"] = self.get_password_hash(data["password"])
-        return await self._repo.update_user(user_id, **data)
+        if user := await self._repo.update_user(user_id, **data):
+            await self._set_user_to_cache(user)
+            return user
+        return None
 
     async def find(self, user_id: UUID) -> UserOutputSchema | None:
         """Find user"""

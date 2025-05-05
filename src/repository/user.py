@@ -35,4 +35,6 @@ class UserRepoV1(BaseRepo):
         obj = await self.find(id=user_id)
         if not obj:
             return None
-        return await self.update(obj, **{"is_active": False})
+        if user := await self.update(obj, **{"is_active": False}):
+            return UserOutputSchema.model_validate(user)
+        return None
