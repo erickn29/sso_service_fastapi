@@ -23,6 +23,8 @@ class UserOutputSchema(BaseModel):
 
 
 class UserInputSchema(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     email: str = Field(min_length=5, max_length=320)
     password: str = Field(min_length=8)
     first_name: str = ""

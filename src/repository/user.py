@@ -8,9 +8,11 @@ from schema.user import UserInputSchema, UserOutputSchema
 class UserRepoV1(BaseRepo):
     model = User
 
-    async def create_user(self, data: UserInputSchema) -> UserOutputSchema:
+    async def create_user(
+        self, data: UserInputSchema, is_admin: bool = False
+    ) -> UserOutputSchema:
         """Create user"""
-        obj = await self.create(**data.model_dump())
+        obj = await self.create(**data.model_dump(), is_admin=is_admin)
         return UserOutputSchema.model_validate(obj)
 
     async def update_user(self, user_id: UUID, **data) -> UserOutputSchema | None:

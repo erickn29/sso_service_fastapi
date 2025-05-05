@@ -10,7 +10,9 @@ from schema.user import UserInputSchema, UserOutputSchema
 
 
 class UserRepoProtocol(Protocol):
-    async def create_user(self, data: UserInputSchema) -> UserOutputSchema:
+    async def create_user(
+        self, data: UserInputSchema, is_admin: bool = False
+    ) -> UserOutputSchema:
         """Create user"""
         pass
 
@@ -36,10 +38,12 @@ class UserServiceV1:
         self._repo = repo()
         self._cache = cache
 
-    async def create(self, user: UserInputSchema) -> UserOutputSchema:
+    async def create(
+        self, user: UserInputSchema, is_admin: bool = False
+    ) -> UserOutputSchema:
         """Create user"""
         user.password = self.get_password_hash(user.password)
-        user_obj = await self._repo.create_user(user)
+        user_obj = await self._repo.create_user(user, is_admin)
         await self._set_user_to_cache(user_obj)
         return user_obj
 
