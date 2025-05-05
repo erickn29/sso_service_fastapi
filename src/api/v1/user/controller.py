@@ -22,3 +22,16 @@ async def read_user(user_id: UUID):
     if user := await UserServiceV1().find(user_id):
         return user
     raise HTTPException(404)
+
+
+@router.put("/{user_id}/", response_model=UserOutputSchema, status_code=201)
+async def update_user(user_id: UUID, user: UserInputSchema):
+    if user_obj := await UserServiceV1().update(user_id, **user.model_dump()):
+        return user_obj
+    raise HTTPException(404)
+
+
+@router.delete("/{user_id}/", status_code=204)
+async def delete_user(user_id: UUID):
+    user = await UserServiceV1().delete(user_id)
+    return {"success": bool(user)}

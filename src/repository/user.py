@@ -23,14 +23,14 @@ class UserRepoV1(BaseRepo):
 
     async def find_user(self, user_id: UUID) -> UserOutputSchema | None:
         """Find user"""
-        obj = await self.find(id=user_id)
+        obj = await self.find(id=user_id, is_active=True)
         if not obj:
             return None
         return UserOutputSchema.model_validate(obj)
 
-    async def delete_user(self, user_id: UUID):
+    async def delete_user(self, user_id: UUID) -> UserOutputSchema | None:
         """Deactivate user"""
         obj = await self.find(id=user_id)
         if not obj:
-            return
-        await self.update(obj, **{"is_active": False})
+            return None
+        return await self.update(obj, **{"is_active": False})

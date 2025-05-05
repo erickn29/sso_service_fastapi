@@ -49,9 +49,6 @@ class SSOAuthMiddleware(AuthenticationMiddleware):
 
 
 class SSOAuthBackend:
-    user_cache_key = "user:"
-    token_expires_in = 60 * 5
-
     async def authenticate(
         self, conn: HTTPConnection
     ) -> tuple[AuthCredentials, UserOutputSchema] | None:

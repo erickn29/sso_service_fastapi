@@ -22,7 +22,7 @@ class UserRepoProtocol(Protocol):
         """Find user"""
         pass
 
-    async def delete_user(self, user_id: UUID):
+    async def delete_user(self, user_id: UUID) -> UserOutputSchema | None:
         """Deactivate user"""
         pass
 
@@ -39,9 +39,9 @@ class UserServiceV1:
     async def create(self, user: UserInputSchema) -> UserOutputSchema:
         """Create user"""
         user.password = self.get_password_hash(user.password)
-        user = await self._repo.create_user(user)
-        await self._set_user_to_cache(user)
-        return user
+        user_obj = await self._repo.create_user(user)
+        await self._set_user_to_cache(user_obj)
+        return user_obj
 
     async def update(self, user_id: UUID, **data) -> UserOutputSchema | None:
         """Update user"""
@@ -56,7 +56,7 @@ class UserServiceV1:
             return user
         return None
 
-    async def delete(self, user_id: UUID):
+    async def delete(self, user_id: UUID) -> UserOutputSchema | None:
         """Deactivate user"""
         return await self._repo.delete_user(user_id)
 
@@ -77,7 +77,7 @@ class UserServiceV1:
         await self._cache.set(
             name=self.user_cache_key + str(user.id),
             value=user_json,
-            expires_in=60 * 5,
+            expires_in=cfg.auth.access_token_expire,
         )
 
     async def _get_user_from_cache(self, user_id: UUID) -> UserOutputSchema | None:
