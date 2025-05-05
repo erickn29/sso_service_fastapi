@@ -2,7 +2,12 @@ from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
 
-from schema.user import UserDeleteSchema, UserInputSchema, UserOutputSchema
+from schema.user import (
+    UserDeleteSchema,
+    UserInputSchema,
+    UserOutputSchema,
+    UserUpdateInputSchema,
+)
 from service.user import UserServiceV1
 
 
@@ -24,7 +29,7 @@ async def read_user(user_id: UUID):
 
 
 @router.put("/{user_id}/", response_model=UserOutputSchema, status_code=201)
-async def update_user(user_id: UUID, user: UserInputSchema):
+async def update_user(user_id: UUID, user: UserUpdateInputSchema):
     if user_obj := await UserServiceV1().update(user_id, **user.model_dump()):
         return user_obj
     raise HTTPException(404)

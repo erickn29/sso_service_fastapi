@@ -248,7 +248,8 @@ class BaseRepo(Generic[T]):
             ModelObject: Обновленный экземпляр модели.
         """
         for key, value in model_data.items():
-            setattr(instance, key, value)
+            if value is not None:
+                setattr(instance, key, value)
         async with self._db.get_session() as session, session.begin():
             session.add(instance)
             await session.flush()

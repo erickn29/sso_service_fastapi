@@ -45,6 +45,8 @@ class UserServiceV1:
 
     async def update(self, user_id: UUID, **data) -> UserOutputSchema | None:
         """Update user"""
+        if data.get("password"):
+            data["password"] = self.get_password_hash(data["password"])
         return await self._repo.update_user(user_id, **data)
 
     async def find(self, user_id: UUID) -> UserOutputSchema | None:

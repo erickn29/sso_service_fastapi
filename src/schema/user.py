@@ -29,6 +29,13 @@ class UserInputSchema(BaseModel):
     last_name: str = ""
 
 
+class UserUpdateInputSchema(BaseModel):
+    email: str | None = Field(None, min_length=5, max_length=320)
+    password: str | None = Field(None, min_length=8)
+    first_name: str | None = ""
+    last_name: str | None = ""
+
+
 class UserLoginSchema(BaseModel):
     email: str = Field(min_length=5, max_length=320)
     password: str = Field(min_length=8)

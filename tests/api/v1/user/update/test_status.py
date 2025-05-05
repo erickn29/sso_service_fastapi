@@ -1,7 +1,7 @@
 async def test_create_user_service_201(client_service, init_data):
     user_data = {
         "email": "example@email.com",
-        "password": "my_password",
+        # "password": "my_password",
         "first_name": "User2",
         "last_name": "User2",
     }
