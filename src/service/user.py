@@ -79,7 +79,7 @@ class UserServiceV1:
         await self._cache.set(
             name=self.user_cache_key + str(user.id),
             value=user_json,
-            expires_in=cfg.auth.access_token_expire,
+            ex=cfg.auth.access_token_expire,
         )
 
     async def _get_user_from_cache(self, user_id: UUID) -> UserOutputSchema | None:

@@ -28,11 +28,11 @@ class Cache:
     async def exists(self, name) -> bool:
         return bool(await self.connection.exists(name))
 
-    async def set(self, name, value, expires_in=CACHE_TIME):
-        if not isinstance(expires_in, int) or expires_in < 1:
+    async def set(self, name, value, ex=CACHE_TIME):
+        if not isinstance(ex, int) or ex < 1:
             return
         try:
-            await self.connection.set(name=name, value=value, ex=expires_in)
+            await self.connection.set(name=name, value=value, ex=ex)
         except RedisError as err:
             print(str(err))
 
