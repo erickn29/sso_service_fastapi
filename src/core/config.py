@@ -57,6 +57,13 @@ class RedisConfig(BaseSettings):
         return f"redis://{self.host}:{self.port}/{self.db}"
 
 
+class EmailConfig(BaseSettings):
+    host: str = "smtp.gmail.com"
+    user: str = "main@gmail.com"
+    password: str = "aaaa bbbb cccc dddd"
+    port: int = 465
+
+
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=f"{Path(__file__).resolve().parent.parent.parent}/secrets/.env",
@@ -69,6 +76,7 @@ class Config(BaseSettings):
     auth: AuthConfig = AuthConfig()
     db: DatabaseConfig = DatabaseConfig()
     redis: RedisConfig = RedisConfig()
+    email: EmailConfig = EmailConfig()
 
 
 config = Config()

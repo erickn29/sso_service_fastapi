@@ -8,10 +8,10 @@ from core.config import config as cfg
 class Mail:
     def __init__(
         self,
-        host: str = cfg.email.HOST,
-        host_user: str = cfg.email.USER,
-        port: int = cfg.email.PORT,
-        password: str = cfg.email.PASSWORD,
+        host: str = cfg.email.host,
+        host_user: str = cfg.email.user,
+        port: int = cfg.email.port,
+        password: str = cfg.email.password,
     ):
         self.host = host
         self.host_user = host_user
@@ -20,10 +20,13 @@ class Mail:
 
     def send_email(self, email: str, message: str, subject: str):
         """Email the user"""
-        message = MIMEText(message)
-        message["Subject"] = subject
-        message["From"] = self.host_user
-        message["To"] = email
+        message_ = MIMEText(message)
+        message_["Subject"] = subject
+        message_["From"] = self.host_user
+        message_["To"] = email
         with smtplib.SMTP_SSL(self.host, self.port) as server:
             server.login(self.host_user, self.password)
-            server.sendmail(self.host_user, email, message.as_string())
+            server.sendmail(self.host_user, email, message_.as_string())
+
+
+mail_service = Mail()
