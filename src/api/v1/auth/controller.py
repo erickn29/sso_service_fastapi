@@ -21,7 +21,7 @@ async def login(login_data: LoginSchema):
     raise HTTPException(400, "Invalid email or password")
 
 
-@router.get("/token/", response_model=TokenSchema)
+@router.get("/token/refresh/", response_model=TokenSchema)
 async def get_access_token(request: Request):
     """Refresh access token"""
     refresh_token = request.cookies.get("refresh_token")

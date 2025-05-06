@@ -15,7 +15,7 @@ async def test_refresh_access_token(client_admin, init_data):
     client_admin.cookies["access_token"] = access_token
     client_admin.cookies["refresh_token"] = refresh_token
 
-    response = await client_admin.get("/api/v1/auth/token/")
+    response = await client_admin.get("/api/v1/auth/token/refresh/")
     assert response.status_code == 200
 
     refresh_token_2 = response.json()["refresh_token"]
@@ -27,6 +27,6 @@ async def test_refresh_access_token(client_admin, init_data):
 
 
 async def test_refresh_access_token_no_refresh_in_cookies(client_admin):
-    response = await client_admin.get("/api/v1/auth/token/")
+    response = await client_admin.get("/api/v1/auth/token/refresh/")
     assert response.status_code == 400
     assert response.json()["detail"] == "Refresh token not found"
