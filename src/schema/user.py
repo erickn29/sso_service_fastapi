@@ -11,6 +11,7 @@ class UserOutputSchema(BaseModel):
     email: str
     first_name: str
     last_name: str
+    services: list
     is_active: bool
     is_admin: bool
     is_service: bool
@@ -34,13 +35,9 @@ class UserInputSchema(BaseModel):
 class UserUpdateInputSchema(BaseModel):
     email: str | None = Field(None, min_length=5, max_length=320)
     password: str | None = Field(None, min_length=8)
-    first_name: str | None = ""
-    last_name: str | None = ""
-
-
-class UserLoginSchema(BaseModel):
-    email: str = Field(min_length=5, max_length=320)
-    password: str = Field(min_length=8)
+    first_name: str | None = None
+    last_name: str | None = None
+    services: list | None = None
 
 
 class UserDeleteSchema(BaseModel):

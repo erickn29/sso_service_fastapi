@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import TIMESTAMP, Boolean, String, Text, func
+from sqlalchemy import ARRAY, TIMESTAMP, Boolean, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from model.base import Base
@@ -13,9 +13,13 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
     first_name: Mapped[str] = mapped_column(String(16), default="")
     last_name: Mapped[str] = mapped_column(String(16), default="")
+    services: Mapped[list] = mapped_column(
+        ARRAY(String), default=[], doc="Доступные сервисы"
+    )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
     is_service: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         server_default=func.current_timestamp(),
