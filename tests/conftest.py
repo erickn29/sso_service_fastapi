@@ -86,7 +86,7 @@ async def fake_redis():
 
 @pytest.fixture(scope="function", autouse=True)
 def mock_send_email(mocker):
-    mocker.patch.object(mail_service, "send_email", return_value=None)
+    mocker.patch("core.celery.send_email_task.delay", return_value=None)
 
 
 @pytest.fixture(scope="function", autouse=True)
