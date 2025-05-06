@@ -7,8 +7,9 @@ from service.user import UserServiceV1
 
 
 async def set_initial_data(session: AsyncSession):
+    admin_password = str(uuid.uuid4())
     admin = User(
-        password=UserServiceV1().get_password_hash(str(uuid.uuid4())),
+        password=UserServiceV1().get_password_hash(admin_password),
         email=str(uuid.uuid4().hex) + "@mail.com",
         first_name=str(uuid.uuid4().hex[:7]),
         last_name=str(uuid.uuid4().hex[:7]),
@@ -57,6 +58,7 @@ async def set_initial_data(session: AsyncSession):
 
     return {
         "admin": admin,
+        "admin_password": admin_password,
         "service": service,
         "blocked_service": blocked_service,
         "default": default,
