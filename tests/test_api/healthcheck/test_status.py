@@ -28,7 +28,7 @@ async def test_healthcheck_admin_400_expired(init_data, client_admin):
     client_admin.cookies = {"access_token": jwt_}
     response = await client_admin.get("/api/healthcheck/")
     assert response.status_code == 400
-    assert response.text == "Обновите токен"
+    assert response.text == "Please, refresh token"
 
 
 async def test_healthcheck_admin_400_no_exp(init_data, client_admin):
@@ -40,7 +40,7 @@ async def test_healthcheck_admin_400_no_exp(init_data, client_admin):
     client_admin.cookies = {"access_token": jwt_}
     response = await client_admin.get("/api/healthcheck/")
     assert response.status_code == 400
-    assert response.text == "Не найден expat"
+    assert response.text == "Expat not found"
 
 
 async def test_healthcheck_admin_400_bad_exp(init_data, client_admin):
@@ -52,7 +52,7 @@ async def test_healthcheck_admin_400_bad_exp(init_data, client_admin):
     client_admin.cookies = {"access_token": jwt_}
     response = await client_admin.get("/api/healthcheck/")
     assert response.status_code == 400
-    assert response.text == "Неверный формат даты в jwt"
+    assert response.text == "Bad date format (need timestamp)"
 
 
 async def test_healthcheck_admin_400_payload_err(init_data, client_admin):
@@ -65,7 +65,7 @@ async def test_healthcheck_admin_400_payload_err(init_data, client_admin):
     client_admin.cookies = {"access_token": jwt_}
     response = await client_admin.get("/api/healthcheck/")
     assert response.status_code == 400
-    assert response.text == "Ошибка получения token payload"
+    assert response.text == "Error decode token"
 
 
 async def test_healthcheck_admin_400_bad_sing(init_data, client_admin):
@@ -77,7 +77,7 @@ async def test_healthcheck_admin_400_bad_sing(init_data, client_admin):
     client_admin.cookies = {"access_token": jwt_}
     response = await client_admin.get("/api/healthcheck/")
     assert response.status_code == 400
-    assert response.text == "Ошибка получения token payload"
+    assert response.text == "Error decode token"
 
 
 async def test_healthcheck_service_200(init_data, client_service):
@@ -89,13 +89,13 @@ async def test_healthcheck_service_401_bad_key(init_data, client_service):
     client_service.headers = {"x-api-key": str(uuid.uuid4())}
     response = await client_service.get("/api/healthcheck/")
     assert response.status_code == 401
-    assert response.json()["detail"] == "Аутентификация не пройдена"
+    assert response.json()["detail"] == "Authentication required"
 
 
 async def test_healthcheck_anonym_401_bad_key(init_data, client_anonym):
     response = await client_anonym.get("/api/healthcheck/")
     assert response.status_code == 401
-    assert response.json()["detail"] == "Аутентификация не пройдена"
+    assert response.json()["detail"] == "Authentication required"
 
 
 async def test_healthcheck_blocked_service_401_bad_key(
@@ -103,4 +103,4 @@ async def test_healthcheck_blocked_service_401_bad_key(
 ):
     response = await client_blocked_service.get("/api/healthcheck/")
     assert response.status_code == 401
-    assert response.json()["detail"] == "Аутентификация не пройдена"
+    assert response.json()["detail"] == "Authentication required"

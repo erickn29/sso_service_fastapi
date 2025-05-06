@@ -94,15 +94,15 @@ class SSOAuthBackend:
     def _get_token_payload(token: str) -> dict:
         if payload := AuthService().get_payload(token):
             return payload
-        raise AuthenticationError("Ошибка получения token payload")
+        raise AuthenticationError("Error decode token")
 
     @staticmethod
     def _check_iat(payload: dict):
         if not payload or not payload.get("expat"):
-            raise AuthenticationError("Не найден expat")
+            raise AuthenticationError("Expat not found")
         try:
             expat = float(payload.get("expat", 0))
         except ValueError:
-            raise AuthenticationError("Неверный формат даты в jwt") from None
+            raise AuthenticationError("Bad date format (need timestamp)") from None
         if datetime.now(tz=TZ.MSK).timestamp() > expat:
-            raise AuthenticationError("Обновите токен")
+            raise AuthenticationError("Please, refresh token")
