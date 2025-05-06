@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from typing import Protocol
 from uuid import UUID
@@ -7,6 +8,7 @@ from core.cache import Cache, cache_service
 from core.config import config as cfg
 from repository.user import UserRepoV1
 from schema.user import UserInputSchema, UserOutputSchema
+from utils.tasks.email import send_email
 
 
 class UserRepoProtocol(Protocol):
@@ -47,6 +49,7 @@ class UserServiceV1:
         user.password = self.get_password_hash(user.password)
         user_obj = await self._repo.create_user(user, is_admin)
         await self._set_user_to_cache(user_obj)
+        await self._send_email(user_obj)
         return user_obj
 
     async def update(self, user_id: UUID, **data) -> UserOutputSchema | None:
@@ -102,3 +105,21 @@ class UserServiceV1:
         if user := await self._cache.get(self.user_cache_key + str(user_id)):
             return UserOutputSchema.model_validate(json.loads(user))
         return None
+
+    async def _send_email(self, user: UserOutputSchema):
+        verification_token = str(uuid.uuid4())
+        await self._cache.set(
+            name=f"verification_token:{verification_token}",
+            value=str(user.id),
+            ex=60 * 60 * 24,
+        )
+        message = f"""
+        Hello {user.first_name} {user.last_name}!\n
+        Please verify your email address by clicking the link below:\n
+        {cfg.app.frontend_url}/verify-email?token={verification_token}
+        """
+        send_email.delay(
+            email=user.email,
+            subject="Registration",
+            message=message,
+        )

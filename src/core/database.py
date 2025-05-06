@@ -37,9 +37,10 @@ class DatabaseHelper:
     async def get_session(self):
         session = None
         try:
-            session: AsyncSession = self.async_session_factory()
+            session: AsyncSession = self.async_session_factory()  # type: ignore
             yield session
-            await session.commit()
+            if session:
+                await session.commit()
         except Exception:  # noqa
             if session:
                 await session.rollback()

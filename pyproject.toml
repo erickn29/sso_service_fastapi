@@ -46,6 +46,9 @@ pythonpath = "src"
 testpaths = ["tests"]
 
 [tool.mypy]
+explicit_package_bases = true
+follow_untyped_imports = true
+check_untyped_defs = true
 
 
 [tool.ruff]

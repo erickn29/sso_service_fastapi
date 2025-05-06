@@ -2,16 +2,16 @@ import smtplib
 
 from email.mime.text import MIMEText
 
-from core.config import config as cfg
+from core.config import config
 
 
 class Mail:
     def __init__(
         self,
-        host: str = cfg.email.host,
-        host_user: str = cfg.email.user,
-        port: int = cfg.email.port,
-        password: str = cfg.email.password,
+        host: str = config.email.host,
+        host_user: str = config.email.user,
+        port: int = config.email.port,
+        password: str = config.email.password,
     ):
         self.host = host
         self.host_user = host_user

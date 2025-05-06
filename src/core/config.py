@@ -14,6 +14,7 @@ DEFAULT_HOSTS = [
 class MainConfig(BaseSettings):
     debug: bool = False
     secret_key: str = "123"
+    frontend_url: str = "http://localhost:3000"
 
 
 class AuthConfig(BaseSettings):
@@ -50,11 +51,19 @@ class DatabaseConfig(BaseSettings):
 class RedisConfig(BaseSettings):
     host: str = "localhost"
     port: int = 6379
-    db: int = 10
+    db: int = 0
 
     @property
     def url(self) -> str:
         return f"redis://{self.host}:{self.port}/{self.db}"
+
+    @property
+    def url_broker(self) -> str:
+        return f"redis://{self.host}:{self.port}/11"
+
+    @property
+    def url_backend(self) -> str:
+        return f"redis://{self.host}:{self.port}/12"
 
 
 class EmailConfig(BaseSettings):
