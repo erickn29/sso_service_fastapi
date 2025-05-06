@@ -9,3 +9,11 @@ class LoginSchema(BaseModel):
 class TokenSchema(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class TokenVerifyInputSchema(BaseModel):
+    token: str
+
+
+class TokenVerifyOutputSchema(BaseModel):
+    is_valid: bool

@@ -40,7 +40,7 @@ async def test_healthcheck_admin_400_no_exp(init_data, client_admin):
     client_admin.cookies = {"access_token": jwt_}
     response = await client_admin.get("/api/healthcheck/")
     assert response.status_code == 400
-    assert response.text == "Не найден expat expat"
+    assert response.text == "Не найден expat"
 
 
 async def test_healthcheck_admin_400_bad_exp(init_data, client_admin):

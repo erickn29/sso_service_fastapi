@@ -1,9 +1,6 @@
 from datetime import datetime
 from uuid import UUID
 
-import jwt
-
-from jwt import InvalidTokenError
 from starlette.authentication import (
     AuthCredentials,
     AuthenticationError,
@@ -13,9 +10,9 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import HTTPConnection
 from starlette.types import Receive, Scope, Send
 
-from core.config import config
 from core.constants import TZ
 from schema.user import UserOutputSchema
+from service.auth import AuthService
 from service.user import UserServiceV1
 
 
@@ -95,17 +92,14 @@ class SSOAuthBackend:
 
     @staticmethod
     def _get_token_payload(token: str) -> dict:
-        try:
-            return jwt.decode(
-                jwt=token, verify=True, algorithms="HS256", key=config.app.secret_key
-            )
-        except InvalidTokenError as e:
-            raise AuthenticationError("Ошибка получения token payload") from e
+        if payload := AuthService().get_payload(token):
+            return payload
+        raise AuthenticationError("Ошибка получения token payload")
 
     @staticmethod
     def _check_iat(payload: dict):
         if not payload or not payload.get("expat"):
-            raise AuthenticationError("Не найден expat expat")
+            raise AuthenticationError("Не найден expat")
         try:
             expat = float(payload.get("expat", 0))
         except ValueError:

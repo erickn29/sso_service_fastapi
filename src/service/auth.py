@@ -4,6 +4,9 @@ from uuid import UUID
 
 import jwt
 
+from fastapi import HTTPException
+from jwt import InvalidTokenError
+
 from core.cache import Cache, cache_service
 from core.config import config
 from core.constants import TZ
@@ -81,6 +84,44 @@ class AuthService:
             "HS256",
         )
 
-    def refresh_access_token(self, refresh_token: str):
+    def refresh_access_token(self, refresh_token: str) -> str:
         """Refresh access token"""
-        pass
+        payload = self.get_payload(refresh_token)
+        if not payload:
+            raise HTTPException(400, "Ошибка получения payload")
+        self._check_expat(payload)
+        user_id = payload.get("id")
+        if not user_id:
+            raise HTTPException(400, "Не найден user id")
+        return self._get_token(user_id, config.auth.access_token_expire)
+
+    def verify_token(self, token: str) -> bool:
+        """Check payload and token expires time"""
+        payload = self.get_payload(token)
+        if not payload:
+            return False
+        try:
+            self._check_expat(payload)
+        except (HTTPException, ValueError):
+            return False
+        return True
+
+    @staticmethod
+    def get_payload(token: str) -> dict[str, str] | None:
+        try:
+            return jwt.decode(
+                jwt=token, verify=True, algorithms="HS256", key=config.app.secret_key
+            )
+        except InvalidTokenError:
+            return None
+
+    @staticmethod
+    def _check_expat(payload: dict | None):
+        if not payload or not payload.get("expat"):
+            raise HTTPException(400, "Не найден expat")
+        try:
+            expat = float(payload.get("expat", 0))
+        except ValueError:
+            raise HTTPException(400, "Неверный формат даты в jwt") from None
+        if datetime.now(tz=TZ.MSK).timestamp() > expat:
+            raise HTTPException(400, "Обновите токен")
