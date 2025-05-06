@@ -1,6 +1,3 @@
-celery:
-	celery -A src.core.celery worker -l info
-
 ruff:
 	ruff check . --fix
 

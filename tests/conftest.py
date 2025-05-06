@@ -24,6 +24,7 @@ from tests.helpers.database.engine import (
 from tests.helpers.database.session import get_session
 from tests.helpers.http_client.client import get_http_client
 from tests.helpers.initial_db_data.data import set_initial_data
+from utils.mail import mail_service
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -81,6 +82,11 @@ async def init_data(refresh_db, session):
 async def fake_redis():
     redis = await get_fake_redis()
     return redis
+
+
+@pytest.fixture(scope="function", autouse=True)
+def mock_send_email(mocker):
+    mocker.patch.object(mail_service, "send_email", return_value=None)
 
 
 @pytest.fixture(scope="function", autouse=True)

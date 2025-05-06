@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, HTTPException
 from starlette.requests import Request
 
@@ -7,7 +9,9 @@ from schema.auth import (
     TokenVerifyInputSchema,
     TokenVerifyOutputSchema,
 )
+from schema.user import UserVerifySchema
 from service.auth import AuthService
+from service.user import UserServiceV1
 
 
 router = APIRouter()
@@ -36,3 +40,11 @@ async def verify_token(schema: TokenVerifyInputSchema):
     """Check payload and token expiration time"""
     is_valid = AuthService().verify_token(schema.token)
     return TokenVerifyOutputSchema(is_valid=is_valid)
+
+
+@router.get("/verify-email/{token}/", response_model=UserVerifySchema, status_code=200)
+async def verify_email(token: UUID):
+    """Verify email"""
+    if is_verified := await UserServiceV1().verify_email(str(token)):
+        return UserVerifySchema(success=is_verified)
+    raise HTTPException(404)

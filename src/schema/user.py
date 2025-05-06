@@ -42,3 +42,7 @@ class UserUpdateInputSchema(BaseModel):
 
 class UserDeleteSchema(BaseModel):
     success: bool
+
+
+class UserVerifySchema(BaseModel):
+    success: bool

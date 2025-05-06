@@ -81,6 +81,8 @@ class UserServiceV1:
 
     async def delete(self, user_id: UUID) -> UserOutputSchema | None:
         """Deactivate user"""
+        if await self._get_user_from_cache(user_id):
+            await self._cache.delete(self.user_cache_key + str(user_id))
         return await self._repo.delete_user(user_id)
 
     @staticmethod
@@ -113,10 +115,10 @@ class UserServiceV1:
         await self._cache.set(
             name=f"verification_token:{verification_token}",
             value=str(user.id),
-            ex=60 * 60 * 24,
+            ex=60 * 60 * 24 * 7,
         )
         message = f"""
-        Hello {user.first_name} {user.last_name}!\n
+        Hello, {user.first_name} {user.last_name}!\n
         Please verify your email address by clicking the link below:\n
         {cfg.app.frontend_url}/verify-email?token={verification_token}
         """
@@ -125,3 +127,11 @@ class UserServiceV1:
             subject="Registration",
             message=message,
         )
+
+    async def verify_email(self, token: str):
+        user_id: bytes = await self._cache.get(f"verification_token:{token}")
+        if not user_id:
+            return False
+        await self._repo.update_user(UUID(user_id.decode()), is_verified=True)
+        await self._cache.delete(f"verification_token:{token}")
+        return True
