@@ -10,4 +10,4 @@ check:
 test:
   stage: test
   script:
-    - echo "Test..."
+    - echo "Test... "
