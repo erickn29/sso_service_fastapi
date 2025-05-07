@@ -2,10 +2,10 @@ services:
 
   app:
     env_file:
-      - src/.secrets/.env
+      - backend/src/.secrets/.env
     build:
-      dockerfile: ./Dockerfile
-      context: ./
+      dockerfile: Dockerfile
+      context: ./backend
     ports:
       - "8000:8000"
     depends_on:
@@ -28,10 +28,10 @@ services:
 
   celery:
     build:
-      dockerfile: ./Dockerfile
-      context: ./
+      dockerfile: Dockerfile
+      context: ./backend
     env_file:
-      - src/.secrets/.env
+      - backend/src/.secrets/.env
     depends_on:
       redis:
         condition: service_healthy
@@ -51,7 +51,7 @@ services:
   db:
     image: postgres:16
     env_file:
-      - src/.secrets/.env
+      - backend/src/.secrets/.env
     restart: always
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
