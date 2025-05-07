@@ -1,0 +1,13 @@
+stages:
+  - check
+  - test
+
+check:
+  stage: check
+  script:
+    - echo "Check..."
+
+test:
+  stage: test
+  script:
+    - echo "Test..."
