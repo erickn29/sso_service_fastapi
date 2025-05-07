@@ -6,8 +6,12 @@ check:
   stage: check
   script:
     - echo "Check..."
+  tags:
+    - sso
 
 test:
   stage: test
   script:
-    - echo "Test... "
+    - echo "Test..."
+  tags:
+    - sso
