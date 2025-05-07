@@ -104,8 +104,8 @@ ENV/
 /.ipython/
 docker-compose.yml
 src.celerybeat-schedule
-secrets/.env.dev
-secrets/.env.prod
+backend/secrets/.env.dev
+backend/secrets/.env.prod
 firebase.json
 
 # serts
