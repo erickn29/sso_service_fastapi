@@ -10,23 +10,23 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
 
-from backend.tests.helpers.auth.auth import get_jwt
-from backend.tests.helpers.cache.cache import get_fake_redis
-from backend.tests.helpers.database.database import (
+from core.config import config
+from main import app
+from model.base import Base
+from tests.helpers.auth.auth import get_jwt
+from tests.helpers.cache.cache import get_fake_redis
+from tests.helpers.database.database import (
     create_test_database,
     drop_test_database,
 )
-from backend.tests.helpers.database.engine import (
+from tests.helpers.database.engine import (
     create_engine,
     dispose_engine,
     drop_and_create_tables,
 )
-from backend.tests.helpers.database.session import get_session
-from backend.tests.helpers.http_client.client import get_http_client
-from backend.tests.helpers.initial_db_data.data import set_initial_data
-from core.config import config
-from main import app
-from model.base import Base
+from tests.helpers.database.session import get_session
+from tests.helpers.http_client.client import get_http_client
+from tests.helpers.initial_db_data.data import set_initial_data
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -13,6 +13,7 @@ DEFAULT_HOSTS = [
 
 class MainConfig(BaseSettings):
     debug: bool = False
+    is_local: bool = False
     secret_key: str = "123"
     frontend_url: str = "http://localhost:3000"
 
@@ -75,7 +76,7 @@ class EmailConfig(BaseSettings):
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=f"{Path(__file__).resolve().parent.parent.parent}/secrets/.env",
+        env_file=f"{Path(__file__).resolve().parent.parent}/.secrets/.env",
         case_sensitive=False,
         env_nested_delimiter="__",
         env_ignore_empty=True,
