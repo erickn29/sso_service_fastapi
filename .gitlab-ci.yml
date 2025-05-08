@@ -5,7 +5,9 @@ stages:
 check:
   stage: check
   script:
-    - echo "Check..."
+    - ruff check .
+    - mypy .
+    - black . --check
   tags:
     - sso
 
