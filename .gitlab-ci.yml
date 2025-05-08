@@ -7,11 +7,11 @@ check:
   script:
     - echo "Check..."
   tags:
-    - dev
+    - sso
 
 test:
   stage: test
   script:
     - echo "Test..."
   tags:
-    - dev
+    - sso
