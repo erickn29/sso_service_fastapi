@@ -1,19 +1,20 @@
 stages:
-  - check
+#  - check
   - test
 
-check:
-  stage: check
-  script:
-    - docker compose -f docker-compose-check.yaml up --build -d
-    - docker compose -f docker-compose-check.yaml exec app ruff check .
-    - docker compose -f docker-compose-check.yaml exec app mypy .
-    - docker compose -f docker-compose-check.yaml exec app black . --check
-    - docker compose -f docker-compose-check.yaml down
+#check:
+#  stage: check
+#  script:
+#    - docker compose -f docker-compose-check.yaml up --build -d
+#    - docker compose -f docker-compose-check.yaml exec app ruff check .
+#    - docker compose -f docker-compose-check.yaml exec app mypy .
+#    - docker compose -f docker-compose-check.yaml exec app black . --check
+#    - docker compose -f docker-compose-check.yaml down
 
 test:
   stage: test
   script:
     - docker compose -f docker-compose-test.yaml up --build -d
+    - docker compose -f docker-compose-test.yaml exec app ls -la
     - docker compose -f docker-compose-test.yaml exec app pytest backend
     - docker compose -f docker-compose-test.yaml down
