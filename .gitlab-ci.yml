@@ -14,4 +14,6 @@ check:
 test:
   stage: test
   script:
-    - echo "Test..."
+    - docker compose -f docker-compose-test.yaml up --build -d
+    - docker compose -f docker-compose-test.yaml exec app pytest
+    - docker compose -f docker-compose-test.yaml down

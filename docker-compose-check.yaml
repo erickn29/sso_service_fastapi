@@ -4,7 +4,7 @@ services:
     env_file:
       - $env
     build:
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile.check
       context: ./backend
     ports:
       - "8008:8000"
