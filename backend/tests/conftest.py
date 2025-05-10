@@ -41,7 +41,9 @@ def event_loop():
 
 @pytest.fixture(scope="session")
 def database():
-    db_url = create_test_database(user=config.db.user, password=config.db.password)
+    db_url = create_test_database(
+        user=config.db.user, password=config.db.password, host=config.db.host
+    )
     yield db_url
     drop_test_database(db_url)
 
