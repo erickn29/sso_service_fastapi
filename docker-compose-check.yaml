@@ -1,0 +1,18 @@
+services:
+
+  app:
+    env_file:
+      - $env
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+    ports:
+      - "8008:8000"
+    command:
+      - ruff check .
+      - mypy .
+      - black . --check
+
+volumes:
+  pg_data:
+  redis_data:
