@@ -2,10 +2,14 @@ stages:
   - check
   - test
 
+before_script:
+  - apk add --no-cache docker-compose  # Ставим compose
+  - docker-compose --version           # Проверяем установку
+
 check:
   stage: check
   script:
-    - docker compose up app
+    - docker-compose up app
     - ruff check .
     - mypy .
     - black . --check
