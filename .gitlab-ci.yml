@@ -16,5 +16,5 @@ test:
   script:
     - docker compose -f docker-compose-test.yaml up --build -d
     - docker compose -f docker-compose-test.yaml exec app ls -la
-    - docker compose -f docker-compose-test.yaml exec app pytest backend
+    - docker compose -f docker-compose-test.yaml exec app pytest
     - docker compose -f docker-compose-test.yaml down
