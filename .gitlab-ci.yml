@@ -5,6 +5,7 @@ stages:
 check:
   stage: check
   script:
+    - docker-compose up app
     - ruff check .
     - mypy .
     - black . --check
