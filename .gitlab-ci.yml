@@ -5,13 +5,9 @@ stages:
 check:
   stage: check
   script:
-    - docker compose run --rm app ruff check .
-  tags:
-    - sso
+    - docker compose -f docker-compose-test.yaml run --rm app
 
 test:
   stage: test
   script:
     - echo "Test..."
-  tags:
-    - sso

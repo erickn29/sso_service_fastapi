@@ -1,0 +1,72 @@
+services:
+
+  app:
+    env_file:
+      - $env
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command:
+      - ruff check .
+      - mypy .
+      - black . --check
+
+  redis:
+    image: redis:latest
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+  celery:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+    env_file:
+      - $env
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: celery -A core.celery worker -l info
+
+  flower:
+    image: mher/flower
+    restart: always
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/11
+    ports:
+      - "5555:5555"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    env_file:
+      - $env
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
+  redis_data:
