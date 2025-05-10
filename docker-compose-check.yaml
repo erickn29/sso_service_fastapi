@@ -6,5 +6,3 @@ services:
     build:
       dockerfile: docker/Dockerfile.check
       context: ./backend
-    ports:
-      - "8008:8000"
