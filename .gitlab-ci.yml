@@ -6,8 +6,7 @@ check:
   stage: check
   script:
     - docker compose -f docker-compose-check.yaml down
-    - docker compose -f docker-compose-check.yaml build app
-    - docker compose -f docker-compose-check.yaml up app
+    - docker compose -f docker-compose-check.yaml up --build
     - ruff check .
     - mypy .
     - black . --check
