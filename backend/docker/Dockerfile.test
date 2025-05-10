@@ -15,6 +15,6 @@ RUN poetry install --no-interaction --no-ansi --with dev
 
 COPY . .
 
-RUN chmod +x entrypoint_app.sh
+RUN chmod +x src/entrypoint_app.sh
 
 CMD ["src/entrypoint_app.sh"]
