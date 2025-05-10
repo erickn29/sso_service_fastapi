@@ -6,11 +6,6 @@ check:
   stage: check
   script:
     - docker compose run --rm app ruff check .
-#    - cd backend
-#    - pip install black mypy ruff
-#    - ruff check .
-#    - mypy .
-#    - black . --check
   tags:
     - sso
 
