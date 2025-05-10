@@ -15,4 +15,4 @@ RUN poetry install --no-interaction --no-ansi --with dev
 
 COPY src .
 
-CMD ["uvicorn", "main:app"]
+CMD ["sh", "-c", "ruff check . && mypy . && black . --check"]
