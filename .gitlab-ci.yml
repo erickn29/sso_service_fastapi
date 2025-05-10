@@ -9,9 +9,12 @@ check:
     - docker compose -f docker-compose-check.yaml exec app ruff check .
     #- docker compose -f docker-compose-check.yaml exec app mypy .
     - docker compose -f docker-compose-check.yaml exec app black . --check
-    - docker compose -f docker-compose-check.yaml down
+  after_script:
+    - docker compose -f docker-compose-check.yaml down --remove-orphans
 
 test:
   stage: test
   script:
     - docker compose -f docker-compose-test.yaml up --build --abort-on-container-exit --exit-code-from app
+  after_script:
+    - docker compose -f docker-compose-test.yaml down --remove-orphans
