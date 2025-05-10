@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from starlette.middleware import Middleware
-
-from api.router_general import router as general_router
 from core.config import config
+from api.router_general import router as general_router
+
 from core.middleware.auth import SSOAuthBackend, SSOAuthMiddleware
 
 
