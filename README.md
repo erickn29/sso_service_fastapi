@@ -66,19 +66,25 @@ DB__NAME=sso_db
 REDIS__HOST=localhost
 REDIS__PORT=6379
 REDIS__DB=10
+
+# For db initialize
+POSTRGRES_HOST=db
+POSTGRES_DB=sso_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
 ```
 
 4. Run database migrations:
 
 ```bash
-cd src
+cd backend/src
 alembic upgrade head
 ```
 
 5. Create an admin user:
 
 ```bash
-python src/create_admin_user.py
+python backend/src/create_admin_user.py
 ```
 
 ## Running the Application
@@ -86,7 +92,13 @@ python src/create_admin_user.py
 Start the application with uvicorn:
 
 ```bash
-uvicorn src.main:app --reload
+uvicorn backend.src.main:app --reload
+```
+
+or with docker compose:
+
+```bash
+docker compose -f docker-compose-local.yaml up -d --build
 ```
 
 The API will be available at http://localhost:8000
