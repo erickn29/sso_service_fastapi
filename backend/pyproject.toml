@@ -48,7 +48,8 @@ pythonpath = "src"
 testpaths = ["tests"]
 
 [tool.pytest_env]
-REDIS__HOST = "localhost"
+REDIS__HOST = {value="localhost", skip_if_set=true}
+DB__HOST = {value="localhost", skip_if_set=true}
 
 [tool.mypy]
 explicit_package_bases = true
