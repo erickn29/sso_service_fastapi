@@ -23,6 +23,7 @@ pytz = "^2025.2"
 python-dateutil = "^2.9.0.post0"
 sqlalchemy-utils = "^0.41.2"
 celery = "^5.5.2"
+prometheus-fastapi-instrumentator = "^7.1.0"
 
 
 [tool.poetry.group.dev.dependencies]

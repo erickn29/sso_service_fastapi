@@ -10,6 +10,7 @@ from jwt import InvalidTokenError
 from core.cache import Cache, cache_service
 from core.config import config
 from core.constants import TZ
+from core.log import logger
 from schema.auth import LoginSchema
 from schema.user import UserInputSchema, UserOutputSchema
 from service.user import UserServiceV1
@@ -103,6 +104,7 @@ class AuthService:
         try:
             self._check_expat(payload)
         except (HTTPException, ValueError):
+            logger.error("Token expired")
             return False
         return True
 
