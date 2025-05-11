@@ -1,0 +1,42 @@
+services:
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3030:3000"
+    restart: unless-stopped
+    environment:
+      - GF_LOG_LEVEL=debug
+    volumes:
+      - grafana_storage:/var/lib/grafana
+      - ./monitoring/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+
+  promtail:
+    image: grafana/promtail:latest
+    ports:
+      - "9080:9080"
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./monitoring/promtail.yaml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    privileged: true
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./monitoring/loki.yaml:/etc/loki/local-config.yaml
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+volumes:
+  grafana_storage:
+  prometheus_data:

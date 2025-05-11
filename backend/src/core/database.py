@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from core.config import config as cfg
+from core.log import logger
 
 
 class DatabaseHelper:
@@ -41,7 +42,8 @@ class DatabaseHelper:
             yield session
             if session:
                 await session.commit()
-        except Exception:  # noqa
+        except Exception as err:  # noqa
+            logger.error(str(err))
             if session:
                 await session.rollback()
         finally:

@@ -2,6 +2,7 @@ from redis import RedisError
 from redis import asyncio as aioredis
 
 from core.config import config
+from core.log import logger
 
 
 class Cache:
@@ -34,7 +35,7 @@ class Cache:
         try:
             await self.connection.set(name=name, value=value, ex=ex)
         except RedisError as err:
-            print(str(err))
+            logger.error(str(err))
 
     async def delete(self, key):
         await self.connection.delete(key)
